@@ -4,12 +4,14 @@ enum MOTOR_MODE {
 	MOTOR_BACKWARD
 };
 
-#define LEFT_MOTOR	0
-#define RIGHT_MOTOR	1
+#define RIGHT_MOTOR	0
+#define LEFT_MOTOR	1
 
 #define MAX_SPEED	255
 #define NR_MOTOR	2
 const int motor_pin[NR_MOTOR][2] = {{5,6},{10,11}};
+const int joystick_x_pin = 3;	/* analog A0 */
+const int joystick_y_pin = 4;	/* analog A1 */
 
 void setup()	
 {
@@ -103,6 +105,21 @@ void self_test()
 
 void loop()
 {
-	self_test();
-	delay(5000);
+	int delta_x, delta_y;
+
+	delta_x = analogRead(joystick_x_pin) >> 5;
+	delta_y = analogRead(joystick_y_pin) >> 5;
+
+	if (delta_y > 20)
+		forward();
+	else if (delta_y < 10)
+		backward();
+	else if (delta_x > 20)
+		right();
+	else if (delta_x < 10)
+		left();
+	else
+		motor_stop();
+
+	delay(100);
 }
