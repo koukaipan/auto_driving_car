@@ -106,23 +106,39 @@ void self_test()
 	delay(500);
 }
 
+/**
+  * @brief remap input of joystick to -255~255
+  * Because the input is not so perfect as uniform distribution,
+  * we could not directly use map().
+  * We need to measure the lowest, medium, highest value in advance,
+  * then recalculate the mapped value.
+  */
+int remap_joystick_movement(int low, int med, int high, int v)
+{
+	if (v > high)
+		return MAX_SPEED;
+	else if (v < low)
+		return -MAX_SPEED;
+	else if (v < med) /* from low~med to -255, 0 */
+		return map(v, low, med, -MAX_SPEED, 0);
+	else /* from med~high to 0, 255 */
+		return map(v, med, high, 0, 255);
+}
+
+void read_joystick(int *delta_x, int *delta_y)
+{
+	/* x: 39, 501, 944 */
+	*delta_x = remap_joystick_movement(39, 501, 944, analogRead(joystick_x_pin));
+	/* y: 1, 528, 965 */
+	*delta_y = remap_joystick_movement(1, 528, 965, analogRead(joystick_y_pin));
+}
+
 void loop()
 {
 	int delta_x, delta_y;
+	int left_speed = 0, right_speed = 0;
 
-	delta_x = analogRead(joystick_x_pin) >> 5;
-	delta_y = analogRead(joystick_y_pin) >> 5;
-
-	if (delta_y > 20)
-		forward();
-	else if (delta_y < 10)
-		backward();
-	else if (delta_x > 20)
-		right();
-	else if (delta_x < 10)
-		left();
-	else
-		motor_stop();
+	read_joystick(&delta_x, &delta_y);
 
 	delay(100);
 }
