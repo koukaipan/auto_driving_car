@@ -140,5 +140,22 @@ void loop()
 
 	read_joystick(&delta_x, &delta_y);
 
+	if (delta_x >= 0)
+		left_speed += delta_x;
+	else
+		right_speed += (-delta_x);
+
+	if (delta_y >= 0) {
+		left_speed += delta_y;
+		right_speed += delta_y;
+		run_motor(LEFT_MOTOR, MOTOR_FORWARD, left_speed);
+		run_motor(RIGHT_MOTOR, MOTOR_FORWARD, right_speed);
+	} else {
+		left_speed += (-delta_y);
+		right_speed += (-delta_y);
+		run_motor(LEFT_MOTOR, MOTOR_BACKWARD, left_speed);
+		run_motor(RIGHT_MOTOR, MOTOR_BACKWARD, right_speed);
+	}
+
 	delay(100);
 }
