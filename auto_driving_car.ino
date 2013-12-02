@@ -32,6 +32,9 @@ void setup()
 */
 void run_motor(int nr_motor, int mode, int speed)
 {
+	if (speed > MAX_SPEED)
+		speed = MAX_SPEED;
+
 	switch (mode) {
 	case MOTOR_STOP:
 		analogWrite(motor_pin[nr_motor][0], 0);
